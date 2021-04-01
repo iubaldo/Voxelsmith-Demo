@@ -2,14 +2,14 @@
 
 importer="wavefront_obj"
 type="Mesh"
-path="res://.import/anvil.obj-e5d1f5cf5bc7adf47a6b24e9c51bf285.mesh"
+path="res://.import/anvil.obj-79735229ef430711241d6b1ff1397a0a.mesh"
 
 [deps]
 
-files=[ "res://.import/anvil.obj-e5d1f5cf5bc7adf47a6b24e9c51bf285.mesh" ]
+files=[ "res://.import/anvil.obj-79735229ef430711241d6b1ff1397a0a.mesh" ]
 
-source_file="res://models/anvil.obj"
-dest_files=[ "res://.import/anvil.obj-e5d1f5cf5bc7adf47a6b24e9c51bf285.mesh", "res://.import/anvil.obj-e5d1f5cf5bc7adf47a6b24e9c51bf285.mesh" ]
+source_file="res://Models/anvil.obj"
+dest_files=[ "res://.import/anvil.obj-79735229ef430711241d6b1ff1397a0a.mesh", "res://.import/anvil.obj-79735229ef430711241d6b1ff1397a0a.mesh" ]
 
 [params]
 
