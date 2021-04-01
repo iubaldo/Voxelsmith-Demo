@@ -2,43 +2,35 @@ extends Spatial
 
 onready var voxel = preload("res://Scenes/Voxel.tscn")
 onready var voxelGrid = get_node("VoxelGrid")
-onready var powerLabel = get_node("PowerLabel").get_node("Label")
+onready var powerLabel = get_node("SmithingUI/PowerLabel")
+onready var remainingVoxelsLabel = get_node("SmithingUI/RemainingVoxelsLabel")
 onready var strikeTimer = get_node("StrikeTimer")
 
-var voxelArray = []
 var voxelList = []
+var pritchelHole = [Vector3(8.5, 0.5, -1.5), Vector3(9.5, 0.5, -1.5), Vector3(8.5, 0.5, -0.5), Vector3(9.5, 0.5, -0.5),
+					Vector3(8.5, 0.5, 0.5), Vector3(9.5, 0.5, 0.5), Vector3(8.5, 0.5, 1.5), Vector3(9.5, 0.5, 1.5)]
 var targetVoxel = null
-var areaWidth = 32
-var areaHeight = 16
-var anvilWidth = 16
-var anvilHeight = 8
-var offsetX = areaWidth / 2
-var offsetY = areaHeight / 2
+
+var remainingVoxels = 50
 
 var maxPower = 500
 var strikePower = 0
 var powerIncreaseRate = 250
 
-var cameraForward = Vector3.RIGHT
+var cameraForward = Vector3.FORWARD
 var cameraBack =  Vector3.BACK
 var cameraLeft = Vector3.LEFT
-var cameraRight = Vector3.FORWARD
+var cameraRight = Vector3.RIGHT
 
 var mousecastLength = 50
-
-func _ready():
-	for x in range(areaWidth):
-		voxelArray.append([])
-		voxelArray[x] = []
-		for y in range(areaHeight):
-			voxelArray[x].append([])
-			voxelArray[x][y] = null
 
 func _process(delta):
 	if strikePower != 0:
 		powerLabel.text = "Power: " + var2str(int(strikePower))
 	else:
 		powerLabel.text = ""
+		
+	remainingVoxelsLabel.text = "Remaining Metal: " + var2str(remainingVoxels)
 		
 	voxelList = voxelGrid.get_children()
 		
@@ -87,7 +79,10 @@ func Strike(target, power):
 	var targetList = []
 	
 	if power <= 200: # light
-		targetList.push_back(checkExistingVoxel(targetVoxel.translation + cameraForward))
+		if pritchelHole.has(target.global_transform.origin):
+			target.queue_free()
+		else:
+			targetList.push_back(checkExistingVoxel(targetVoxel.translation + cameraForward))
 	elif power <= 300: # medium
 		targetList.push_back(checkExistingVoxel(targetVoxel.translation + cameraForward))
 		targetList.push_back(checkExistingVoxel(targetVoxel.translation + cameraBack))
@@ -104,10 +99,11 @@ func Strike(target, power):
 		targetList.push_back(checkExistingVoxel(targetVoxel.translation + cameraBack + cameraLeft))
 		
 	for pos in targetList:
-		if pos != null:
+		if pos != null && remainingVoxels > 0:
 			var vox = voxel.instance()
 			voxelGrid.add_child(vox)
 			vox.translation = pos
+			remainingVoxels -= 1
 		
 func checkExistingVoxel(targetPos):
 	for pos in voxelList:
@@ -139,13 +135,17 @@ func rotateCCW():
 func moveGrid(direction):
 	match direction:
 		1: # up
-			voxelGrid.translation += Vector3.RIGHT
+			if (voxelGrid.translation.z + Vector3.FORWARD.z >= -7.5):
+				voxelGrid.translation += Vector3.FORWARD
 		2: # right
-			voxelGrid.translation += Vector3.BACK
+			if (voxelGrid.translation.x + Vector3.RIGHT.x <= 15.5):
+				voxelGrid.translation += Vector3.RIGHT
 		3: # down
-			voxelGrid.translation += Vector3.LEFT
+			if (voxelGrid.translation.z + Vector3.BACK.z <= 7.5):
+				voxelGrid.translation += Vector3.BACK
 		4: # left
-			voxelGrid.translation += Vector3.FORWARD
+			if (voxelGrid.translation.x + Vector3.LEFT.x >= -15.5):
+				voxelGrid.translation += Vector3.LEFT
 
 func _on_StrikeTimer_timeout():
 	strikePower = 0
