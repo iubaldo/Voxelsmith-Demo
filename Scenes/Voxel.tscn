@@ -1,0 +1,23 @@
+[gd_scene load_steps=4 format=2]
+
+[ext_resource path="res://Scripts/Voxel.gd" type="Script" id=2]
+
+[sub_resource type="CubeMesh" id=1]
+
+[sub_resource type="BoxShape" id=2]
+
+[node name="Voxel" type="Spatial"]
+transform = Transform( 0.5, 0, 0, 0, 0.5, 0, 0, 0, 0.5, 0, 0, 0 )
+script = ExtResource( 2 )
+
+[node name="MeshInstance" type="MeshInstance" parent="."]
+mesh = SubResource( 1 )
+material/0 = null
+
+[node name="Area" type="Area" parent="MeshInstance"]
+input_capture_on_drag = true
+
+[node name="CollisionShape" type="CollisionShape" parent="MeshInstance/Area"]
+shape = SubResource( 2 )
+[connection signal="mouse_entered" from="MeshInstance/Area" to="." method="_on_Area_mouse_entered"]
+[connection signal="mouse_exited" from="MeshInstance/Area" to="." method="_on_Area_mouse_exited"]
