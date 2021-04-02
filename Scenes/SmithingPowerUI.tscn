@@ -35,3 +35,14 @@ valign = 1
 __meta__ = {
 "_edit_use_anchors_": false
 }
+
+[node name="HeatLabel" type="Label" parent="."]
+margin_left = 691.0
+margin_right = 1009.0
+margin_bottom = 61.0
+custom_fonts/font = SubResource( 1 )
+text = "Lorem Ipsum"
+valign = 1
+__meta__ = {
+"_edit_use_anchors_": false
+}
