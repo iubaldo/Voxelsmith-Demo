@@ -54,6 +54,10 @@ func _process(delta):
 	if Input.is_action_just_released("pointer"):
 		strikeTimer.start()
 		
+	# add ingot (debug)
+	if Input.is_action_just_pressed("1"):
+		addIngot(1)
+		
 	# Move grid commands
 	if Input.is_action_just_pressed("rotateCW"):
 		rotateCW()
@@ -70,10 +74,11 @@ func _process(delta):
 		moveGrid(4)
 		
 func _physics_process(delta):
-	for vox in voxelList:
-		if vox.isTargeted:
-			targetVoxel = vox
-			break
+	if !voxelList.empty():
+		for vox in voxelList:
+			if vox.isTargeted:
+				targetVoxel = vox
+				break
 		
 func Strike(target, power):
 	var targetList = []
@@ -113,6 +118,21 @@ func checkExistingVoxel(targetPos):
 	
 	print("position added")
 	return targetPos
+	
+func addIngot(size):
+	if voxelList.empty():
+		match size:
+			1:
+				for x in range (-4, 3):
+					for z in range (-1 ,2):
+						var vox = voxel.instance()
+						voxelGrid.add_child(vox)
+						vox.translation = Vector3(x, 0, z)
+	else:
+		match size:
+			1:
+				remainingVoxels += 32
+	
 
 func rotateCW():
 	voxelGrid.rotate_y(deg2rad(-90.0))
