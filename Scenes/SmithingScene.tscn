@@ -1,4 +1,4 @@
-[gd_scene load_steps=10 format=2]
+[gd_scene load_steps=13 format=2]
 
 [ext_resource path="res://Scenes/VoxelGrid.tscn" type="PackedScene" id=1]
 [ext_resource path="res://Scenes/SmithingPowerUI.tscn" type="PackedScene" id=2]
@@ -9,9 +9,57 @@
 [ext_resource path="res://Scenes/Hammer.tscn" type="PackedScene" id=7]
 [ext_resource path="res://Animations/HammerStrike.tres" type="Animation" id=8]
 [ext_resource path="res://Scenes/OutlineGrid.tscn" type="PackedScene" id=9]
+[ext_resource path="res://Scenes/Wall.tscn" type="PackedScene" id=10]
+[ext_resource path="res://Scenes/Forge.tscn" type="PackedScene" id=11]
+[ext_resource path="res://Scenes/Floor.tscn" type="PackedScene" id=12]
 
 [node name="Smithing Scene" type="Spatial"]
 script = ExtResource( 3 )
+
+[node name="Camera" type="Camera" parent="."]
+transform = Transform( 1, 0, 0, 0, 0.152382, 0.988322, 0, -0.988322, 0.152382, 0.0583339, 17.4061, 3.30747 )
+
+[node name="ScreenShake" type="Spatial" parent="Camera"]
+script = ExtResource( 4 )
+
+[node name="ShakeFreq" type="Timer" parent="Camera/ScreenShake"]
+
+[node name="ShakeTween" type="Tween" parent="Camera/ScreenShake"]
+
+[node name="ShakeDuration" type="Timer" parent="Camera/ScreenShake"]
+one_shot = true
+
+[node name="DirectionalLight" type="DirectionalLight" parent="."]
+transform = Transform( 1, 0, 0, 0, 0.444135, 0.89596, 0, -0.89596, 0.444135, 0, 15.1839, 0 )
+
+[node name="Environment" type="Spatial" parent="."]
+
+[node name="Anvil" parent="Environment" instance=ExtResource( 5 )]
+transform = Transform( 20, 0, 0, 0, 20, 0, 0, 0, 20, -12, -40.1, 0 )
+
+[node name="TransparentGrid" parent="Environment" instance=ExtResource( 6 )]
+transform = Transform( -6.35391e-08, -0.39, 0, -6.35391e-08, 1.03518e-14, -1, 0.39, -6.35391e-08, -1.62921e-07, 0, 0, 0 )
+
+[node name="Forge" parent="Environment" instance=ExtResource( 11 )]
+transform = Transform( -6.51683e-06, 0, -40, 0, 40, 0, 40, 0, -6.51683e-06, 118.811, -40, 78.3325 )
+
+[node name="Wall" parent="Environment" instance=ExtResource( 10 )]
+transform = Transform( -6.51683e-06, 0, 40, 0, 40, 0, -40, 0, -6.51683e-06, 0, -40, -50 )
+
+[node name="Wall5" parent="Environment" instance=ExtResource( 10 )]
+transform = Transform( -6.51683e-06, 0, 40, 0, 40, 0, -40, 0, -6.51683e-06, -150, -40, -50 )
+
+[node name="Wall2" parent="Environment" instance=ExtResource( 10 )]
+transform = Transform( -6.51683e-06, 0, 40, 0, 40, 0, -40, 0, -6.51683e-06, 160, -40, -50 )
+
+[node name="Wall3" parent="Environment" instance=ExtResource( 10 )]
+transform = Transform( 40, 0, 0, 0, 40, 0, 0, 0, 40, 240, -40, 30 )
+
+[node name="Wall4" parent="Environment" instance=ExtResource( 10 )]
+transform = Transform( 40, 0, 0, 0, 40, 0, 0, 0, 40, 240, -40, 190 )
+
+[node name="Floor" parent="Environment" instance=ExtResource( 12 )]
+transform = Transform( 200, 0, 0, 0, 50, 0, 0, 0, 200, 432.108, -45, 196.72 )
 
 [node name="VoxelGrid" parent="." instance=ExtResource( 1 )]
 transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0.5, 0.5, -0.5 )
@@ -29,28 +77,6 @@ one_shot = true
 wait_time = 0.3
 one_shot = true
 
-[node name="Camera" type="Camera" parent="."]
-transform = Transform( 1, 0, 0, 0, 0.152382, 0.988322, 0, -0.988322, 0.152382, 0.0583339, 17.4061, 3.30747 )
-
-[node name="ScreenShake" type="Spatial" parent="Camera"]
-script = ExtResource( 4 )
-
-[node name="ShakeFreq" type="Timer" parent="Camera/ScreenShake"]
-
-[node name="ShakeTween" type="Tween" parent="Camera/ScreenShake"]
-
-[node name="ShakeDuration" type="Timer" parent="Camera/ScreenShake"]
-one_shot = true
-
-[node name="Anvil" parent="." instance=ExtResource( 5 )]
-transform = Transform( 20, 0, 0, 0, 20, 0, 0, 0, 20, -12, -40.1, 0 )
-
-[node name="TransparentGrid" parent="." instance=ExtResource( 6 )]
-transform = Transform( -6.35391e-08, -0.39, 0, -6.35391e-08, 1.03518e-14, -1, 0.39, -6.35391e-08, -1.62921e-07, 0, 0, 0 )
-
-[node name="DirectionalLight" type="DirectionalLight" parent="."]
-transform = Transform( 1, 0, 0, 0, 0.444135, 0.89596, 0, -0.89596, 0.444135, 0, 15.1839, 0 )
-
 [node name="HammerNode" type="Spatial" parent="."]
 visible = false
 
@@ -59,7 +85,7 @@ transform = Transform( 6.06218, -3.5, -5.70222e-07, 0, -1.14044e-06, 7, -3.5, -6
 
 [node name="HammerAnimPlayer" type="AnimationPlayer" parent="HammerNode"]
 anims/HammerStrike = ExtResource( 8 )
-[connection signal="timeout" from="StrikeTimer" to="." method="_on_StrikeTimer_timeout"]
-[connection signal="timeout" from="StrikeCDTimer" to="." method="_on_StrikeCDTimer_timeout"]
 [connection signal="timeout" from="Camera/ScreenShake/ShakeFreq" to="Camera/ScreenShake" method="_on_ShakeFreq_timeout"]
 [connection signal="timeout" from="Camera/ScreenShake/ShakeDuration" to="Camera/ScreenShake" method="_on_ShakeDuration_timeout"]
+[connection signal="timeout" from="StrikeTimer" to="." method="_on_StrikeTimer_timeout"]
+[connection signal="timeout" from="StrikeCDTimer" to="." method="_on_StrikeCDTimer_timeout"]
