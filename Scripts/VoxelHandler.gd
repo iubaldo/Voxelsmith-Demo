@@ -41,7 +41,7 @@ func _process(delta):
 		powerLabel.text = ""
 		
 	remainingVoxelsLabel.text = "Remaining Metal: " + var2str(remainingVoxels)
-	heatLabel.text = "Heat: " + var2str(int(voxelGrid.heat))
+	heatLabel.text = "Heat: " + var2str(int(voxelGrid.gridHeat))
 		
 		
 	voxelList = voxelGrid.get_children()
@@ -145,7 +145,7 @@ func Strike(target, power):
 				var vox = voxel.instance()
 				voxelGrid.add_child(vox)
 				vox.translation = pos
-				vox.heat = voxelGrid.heat
+				vox.heat = targetVoxel.heat
 				remainingVoxels -= 1
 		
 func checkExistingVoxel(targetPos, globalTargetPos, powerLevel):
@@ -159,15 +159,16 @@ func checkExistingVoxel(targetPos, globalTargetPos, powerLevel):
 		if vox.translation == targetPos:
 			if pritchelHole.has_point(Vector2(vox.global_transform.origin.x, vox.global_transform.origin.z)):
 				vox.queue_free()
-				print("invalid position: " + var2str(vox.translation))
-				return null	
-			vox.heat = clamp(targetVoxel.heat - heatLoss, 0, targetVoxel.heatTol)
+				# print("invalid position: " + var2str(vox.translation))
+				return null
+				
+			vox.heat = clamp(vox.heat - heatLoss, 0, vox.heatTol)
 			return null
 	if !anvilBounds.has_point(Vector2(globalTargetPos.x, globalTargetPos.z)) \
 		|| pritchelHole.has_point(Vector2(globalTargetPos.x, globalTargetPos.z)):
 		return null
 	
-	print("position added")
+	# print("position added")
 	return targetPos
 	
 func addIngot(size):

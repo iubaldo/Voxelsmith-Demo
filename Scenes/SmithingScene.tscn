@@ -1,4 +1,4 @@
-[gd_scene load_steps=9 format=2]
+[gd_scene load_steps=10 format=2]
 
 [ext_resource path="res://Scenes/VoxelGrid.tscn" type="PackedScene" id=1]
 [ext_resource path="res://Scenes/SmithingPowerUI.tscn" type="PackedScene" id=2]
@@ -8,11 +8,15 @@
 [ext_resource path="res://Scenes/TransparentGrid.tscn" type="PackedScene" id=6]
 [ext_resource path="res://Scenes/Hammer.tscn" type="PackedScene" id=7]
 [ext_resource path="res://Animations/HammerStrike.tres" type="Animation" id=8]
+[ext_resource path="res://Scenes/OutlineGrid.tscn" type="PackedScene" id=9]
 
 [node name="Smithing Scene" type="Spatial"]
 script = ExtResource( 3 )
 
 [node name="VoxelGrid" parent="." instance=ExtResource( 1 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0.5, 0.5, -0.5 )
+
+[node name="OutlineGrid" parent="." instance=ExtResource( 9 )]
 transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0.5, 0.5, -0.5 )
 
 [node name="SmithingUI" parent="." instance=ExtResource( 2 )]
