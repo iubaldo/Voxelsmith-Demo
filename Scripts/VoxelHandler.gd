@@ -3,20 +3,53 @@ extends Spatial
 onready var voxel = preload("res://Scenes/Voxel.tscn")
 onready var voxelGrid = get_node("VoxelGrid/Voxels")
 onready var outlineGrid = get_node("OutlineGrid")
+
 onready var powerLabel = get_node("SmithingUI/PowerLabel")
 onready var remainingVoxelsLabel = get_node("SmithingUI/RemainingVoxelsLabel")
+onready var remainingVoxelsBox = get_node("SmithingUI/RemainingVoxelsBox")
 onready var heatLabel = get_node("SmithingUI/HeatLabel")
 onready var voxelsLeftLabel = get_node("SmithingUI/VoxelsLeftLabel")
+onready var powerBar = get_node("SmithingUI/PowerBar")
+onready var completeBox = get_node("SmithingUI/SmithingCompleteBox")
+onready var completeText = get_node("SmithingUI/SmithingCompleteLabel")
+
 onready var strikeTimer = get_node("StrikeTimer") # amount of time to click again after charging a strike
 onready var strikeCDTimer = get_node("StrikeCDTimer")
+
 onready var hammerAnimPlayer = get_node("HammerNode/HammerAnimPlayer")
 onready var hammerModel = get_node("HammerNode")
+
 onready var camera = get_node("CameraPath/PathFollow/Camera")
 onready var cameraShake = get_node("CameraPath/PathFollow/Camera/ScreenShake")
+
 onready var heatPoint = get_node("Environment/Forge/HeatPoint")
+
+onready var audioPlayer = get_node("AudioPlayer")
+onready var hitSound1 = preload("res://Sounds/anvilHit1.wav")
+onready var hitSound2 = preload("res://Sounds/anvilHit2.wav")
+onready var hitSound3 = preload("res://Sounds/anvilHit3.wav")
+onready var hitSound4 = preload("res://Sounds/anvilHit4.wav")
+onready var hitSound5 = preload("res://Sounds/anvilHit5.wav")
+var hitSounds = [ hitSound1, hitSound2, hitSound3, hitSound4, hitSound5 ]
+
+onready var guard1 = preload("res://Scenes/SwordComponents/Guard1.tscn")
+onready var guard2 = preload("res://Scenes/SwordComponents/Guard2.tscn")
+onready var guard3 = preload("res://Scenes/SwordComponents/Guard3.tscn")
+onready var handle1 = preload("res://Scenes/SwordComponents/Handle1.tscn")
+onready var handle2 = preload("res://Scenes/SwordComponents/Handle2.tscn")
+onready var handle3 = preload("res://Scenes/SwordComponents/Handle3.tscn")
+onready var pommel1 = preload("res://Scenes/SwordComponents/Pommel1.tscn")
+onready var pommel2 = preload("res://Scenes/SwordComponents/Pommel2.tscn")
+onready var pommel3 = preload("res://Scenes/SwordComponents/Pommel3.tscn")
 
 var active = true
 var forgeActive = false
+var doneForging = false
+var quitReady = false
+
+var guardSet = false
+var handleSet = false
+var pommelSet = false
 
 var voxelList = []
 var pritchelHole = Rect2(8.5, -1.5, 2, 4)
@@ -27,7 +60,7 @@ var removal = false
 var remainingVoxels = 50
 var voxelsCreated = 0
 
-var maxPower = 500
+var maxPower = 400
 var strikePower = 0
 var powerIncreaseRate = 250
 
@@ -42,6 +75,9 @@ var cameraRight = Vector3.RIGHT
 
 var mousecastLength = 50
 
+func _ready():
+	addIngot(2)
+
 func _process(delta):
 	heatLabel.text = "Heat: " + var2str(int(voxelGrid.gridHeat))
 	
@@ -52,6 +88,48 @@ func _process(delta):
 		cameraBack =  Vector3.BACK
 		cameraLeft = Vector3.LEFT
 		cameraRight = Vector3.RIGHT
+		
+	if quitReady && Input.is_action_just_pressed("pointer"):
+		get_tree().quit()
+		
+	if doneForging:
+		for vox in voxelList:
+			vox.setHeat(-10, delta)
+		if Input.is_action_just_pressed("1"):
+			if !guardSet:
+				guard1.instance()
+				guardSet = true
+			if !handleSet:
+				handle1.instance()
+				handleSet = true
+			if !pommelSet:
+				pommel1.instance()
+				pommelSet = true
+		if Input.is_action_just_pressed("2"):
+			if !guardSet:
+				guard2.instance()
+				guardSet = true
+			if !handleSet:
+				handle2.instance()
+				handleSet = true
+			if !pommelSet:
+				pommel2.instance()
+				pommelSet = true
+		if Input.is_action_just_pressed("3"):
+			if !guardSet:
+				guard3.instance()
+				guardSet = true
+			if !handleSet:
+				handle3.instance()
+				handleSet = true
+			if !pommelSet:
+				pommel3.instance()
+				pommelSet = true
+			
+	if doneForging:
+		completeBox.visible = true
+		completeText.visible = true
+		quitReady = true
 		
 	if forgeActive:
 		outlineGrid.visible = false
@@ -67,22 +145,33 @@ func _process(delta):
 	else:
 		outlineGrid.visible = true
 	
-	
 	if active:
 		if strikePower != 0:
-			powerLabel.text = "Power: " + var2str(int(strikePower))
+			powerLabel.text = "Power: " + var2str(int(strikePower))	
 		else:
 			powerLabel.text = ""
 			
+		powerBar.value = strikePower
+		
 		if outlineGrid.voxelsLeft > 0:
 			voxelsLeftLabel.text = "Voxels left: " + var2str(voxelsCreated) + "/" + var2str(outlineGrid.voxelCount)
+			remainingVoxelsBox.visible = true
 		else: 
 			voxelsLeftLabel.text = ""
+			remainingVoxelsBox.visible = false
 			
-		if voxelsCreated == outlineGrid.voxelCount && outlineGrid.voxelsLeft == 0 && outlineGrid.voxelCount != 0:
+		if voxelsCreated == outlineGrid.voxelCount && outlineGrid.voxelCount != 0 && !doneForging:
+			doneForging = true
+			active = false		
+			
+			var tween = Tween.new()
+			tween.interpolate_property(voxelGrid, "translation", voxelGrid.translation, Vector3(0.5, 3, -0.5), 2, Tween.TRANS_SINE, Tween.EASE_IN_OUT)	
+			
 			print ("done")
 			
-		remainingVoxelsLabel.text = "Remaining Metal: " + var2str(remainingVoxels)
+		
+			
+#		remainingVoxelsLabel.text = "Remaining Metal: " + var2str(remainingVoxels)
 	
 		voxelList = voxelGrid.get_children()
 			
@@ -94,12 +183,7 @@ func _process(delta):
 					hammerModel.visible = true
 					hammerModel.translation = targetVoxel.global_transform.origin + Vector3.UP
 					hammerAnimPlayer.play("HammerStrike")
-					#Strike(targetVoxel, strikePower)
-					#strikePower = 0
-					#print("strike")
 					pass
-				else:
-					pass #some kind of penality for too hard
 				
 			if Input.is_action_pressed("pointer") && strikeTimer.is_stopped(): # charge strike
 				if strikePower < maxPower:
@@ -116,8 +200,6 @@ func _process(delta):
 			# 	vox.setHeat(200, delta)
 			print(var2str(targetVoxel.translation))
 
-				
-			
 		# add ingot (debug)
 		if Input.is_action_just_pressed("1"):
 			addIngot(1)
@@ -156,6 +238,17 @@ func _physics_process(delta):
 				pass
 		
 func animStrike():
+	var rng = RandomNumberGenerator.new()
+	rng.randomize()
+	var index = rng.randi_range(1, 4)
+	
+	var audio_file = "res://Sounds/anvilHit" + var2str(index) + ".wav"
+	if File.new().file_exists(audio_file):
+		var sfx = load(audio_file)
+		# sfx.set_loop(false)
+		audioPlayer.stream = sfx
+		audioPlayer.play()
+	
 	cameraShake.start(0.05 + 0.1 * (strikePower / 500), 50, 0.5 * ((strikePower) / 100), 0)
 	Strike(targetVoxel, strikePower)
 	strikeCDTimer.start()
@@ -191,7 +284,7 @@ func Strike(target, power):
 		
 	if !removal && targetVoxel.heat >= targetVoxel.minForgeTemp:
 		for pos in targetList:
-			if pos != null && remainingVoxels > 0:
+			if pos != null: #&& remainingVoxels > 0:
 				var vox = voxel.instance()
 				voxelGrid.add_child(vox)
 				vox.translation = pos
@@ -232,14 +325,18 @@ func addIngot(size):
 						var vox = voxel.instance()
 						voxelGrid.add_child(vox)
 						vox.translation = Vector3(x, 0, z)
-						voxelsCreated += 1
+						for n in outlineGrid.outlineList:
+							if n.global_transform.origin == vox.global_transform.origin:
+								voxelsCreated += 1
 			2: 
-				for x in range (-1, 3):
+				for x in range (-2, 4):
 					for z in range(-1, 2):
 						var vox = voxel.instance()
 						voxelGrid.add_child(vox)
 						vox.translation = Vector3(x, 0, z)
-						voxelsCreated += 1
+						for n in outlineGrid.outlineList:
+							if n == vox.translation:
+								voxelsCreated += 1
 						
 		voxelGrid.translation = Vector3(0.5, 0.5, -0.5)
 		voxelGrid.rotation = Vector3(0, 0, 0)
@@ -249,7 +346,6 @@ func addIngot(size):
 				remainingVoxels += 32
 			2: 
 				remainingVoxels += 12
-	
 
 func rotateCW():
 	voxelGrid.rotate_y(deg2rad(-90.0))

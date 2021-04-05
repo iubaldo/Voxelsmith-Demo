@@ -3,6 +3,7 @@ extends Spatial
 onready var saveLoad = preload("res://Scripts/SaveLoad.gd")
 onready var voxelOutline = preload("res://Scenes/VoxelOutline.tscn")
 onready var voxelGrid = get_parent().get_node("VoxelGrid/Voxels")
+onready var voxelHandler = get_tree().get_root().get_node("Smithing Scene")
 
 var outlineList = []
 var loadPath = "res://Patterns/pattern1.dat"
@@ -54,6 +55,13 @@ func loadData():
 	
 	voxelsLeft = 0
 	voxelCount = 0
+	voxelHandler.voxelsCreated = 0
+	
+	voxelHandler.cameraForward = Vector3.FORWARD
+	voxelHandler.cameraBack =  Vector3.BACK
+	voxelHandler.cameraLeft = Vector3.LEFT
+	voxelHandler.cameraRight = Vector3.RIGHT
+	
 	for pos in outlineList:
 		var vox = voxelOutline.instance()
 		add_child(vox)
@@ -61,4 +69,11 @@ func loadData():
 		voxelsLeft += 1
 		voxelCount += 1
 		
+	for n in voxelGrid.get_children():
+		n.queue_free()
+		
+	voxelHandler.voxelsLeftLabel.visible = true
+		
+	voxelHandler.doneForging = false
+	voxelHandler.active = true
 	print("loaded")
