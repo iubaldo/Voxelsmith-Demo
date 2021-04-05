@@ -11,6 +11,7 @@ onready var strikeTimer = get_node("StrikeTimer") # amount of time to click agai
 onready var strikeCDTimer = get_node("StrikeCDTimer")
 onready var hammerAnimPlayer = get_node("HammerNode/HammerAnimPlayer")
 onready var hammerModel = get_node("HammerNode")
+onready var camera = get_node("CameraPath/PathFollow/Camera")
 onready var cameraShake = get_node("CameraPath/PathFollow/Camera/ScreenShake")
 onready var heatPoint = get_node("Environment/Forge/HeatPoint")
 
@@ -48,7 +49,14 @@ func _process(delta):
 		
 	if forgeActive:
 		outlineGrid.visible = false
-		pass
+		if Input.is_action_pressed("pointer"):
+			var dropPlane = Plane(Vector3(0, 0, 1), -7)
+			var mousePos = camera.project_position(get_viewport().get_mouse_position(), 23)
+			voxelGrid.global_transform.origin = mousePos
+		for vox in voxelList:
+			if vox.global_transform.origin.distance_to(heatPoint.global_transform.origin) < 20:
+				vox.setHeat(200 * (vox.global_transform.origin.distance_to(heatPoint.global_transform.origin) / 20), delta)
+				pass
 	else:
 		outlineGrid.visible = true
 	
@@ -264,11 +272,12 @@ func _on_PathTween_tween_completed(object, key):
 		voxelGrid.rotation = Vector3(0, 0, 0)
 		print("moved to anvil")
 	else:
-		voxelGrid.global_transform.origin = Vector3(90, -10, 78)
+		voxelGrid.global_transform.origin = Vector3(85, -8, 78)
 		voxelGrid.rotation = Vector3(0, PI / 2, 0)
 		print("moved to forge")
 	
 
 func _on_Area_input_event(camera, event, click_position, click_normal, shape_idx):
 	if forgeActive && event.type == InputEvent.MOUSE_BUTTON && event.pressed:
+		
 		pass
