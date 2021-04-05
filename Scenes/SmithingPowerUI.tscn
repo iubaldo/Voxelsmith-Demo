@@ -25,6 +25,18 @@ __meta__ = {
 "_edit_use_anchors_": false
 }
 
+[node name="VoxelsLeftLabel" type="Label" parent="."]
+margin_left = 27.8811
+margin_top = 533.969
+margin_right = 345.881
+margin_bottom = 594.969
+custom_fonts/font = SubResource( 1 )
+text = "Lorem Ipsum"
+valign = 1
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
 [node name="RemainingVoxelsLabel" type="Label" parent="."]
 margin_left = 363.0
 margin_right = 681.0

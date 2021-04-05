@@ -3,10 +3,10 @@ extends Spatial
 onready var voxel = preload("res://Scenes/Voxel.tscn")
 onready var voxelGrid = get_node("VoxelGrid/Voxels")
 onready var outlineGrid = get_node("OutlineGrid")
-onready var voxelGridCollider = get_node("VoxelGrid/Area/CollisionShape")
 onready var powerLabel = get_node("SmithingUI/PowerLabel")
 onready var remainingVoxelsLabel = get_node("SmithingUI/RemainingVoxelsLabel")
 onready var heatLabel = get_node("SmithingUI/HeatLabel")
+onready var voxelsLeftLabel = get_node("SmithingUI/VoxelsLeftLabel")
 onready var strikeTimer = get_node("StrikeTimer") # amount of time to click again after charging a strike
 onready var strikeCDTimer = get_node("StrikeCDTimer")
 onready var hammerAnimPlayer = get_node("HammerNode/HammerAnimPlayer")
@@ -25,6 +25,7 @@ var targetVoxel = null
 var removal = false
 
 var remainingVoxels = 50
+var voxelsCreated = 0
 
 var maxPower = 500
 var strikePower = 0
@@ -46,17 +47,23 @@ func _process(delta):
 	
 	if Input.is_action_just_pressed("move"):
 		active = !active
+		voxelGrid.rotation = Vector3.ZERO
+		cameraForward = Vector3.FORWARD
+		cameraBack =  Vector3.BACK
+		cameraLeft = Vector3.LEFT
+		cameraRight = Vector3.RIGHT
 		
 	if forgeActive:
 		outlineGrid.visible = false
 		if Input.is_action_pressed("pointer"):
 			var dropPlane = Plane(Vector3(0, 0, 1), -7)
 			var mousePos = camera.project_position(get_viewport().get_mouse_position(), 23)
-			voxelGrid.global_transform.origin = mousePos
-		for vox in voxelList:
-			if vox.global_transform.origin.distance_to(heatPoint.global_transform.origin) < 20:
-				vox.setHeat(200 * (vox.global_transform.origin.distance_to(heatPoint.global_transform.origin) / 20), delta)
-				pass
+			voxelGrid.global_transform.origin = Vector3(mousePos.x, voxelGrid.global_transform.origin.y, mousePos.z)
+			
+		if Input.is_action_just_pressed("rotateCW"):
+				rotateCW()
+		if Input.is_action_just_pressed("rotateCCW"):
+			rotateCCW()
 	else:
 		outlineGrid.visible = true
 	
@@ -66,6 +73,14 @@ func _process(delta):
 			powerLabel.text = "Power: " + var2str(int(strikePower))
 		else:
 			powerLabel.text = ""
+			
+		if outlineGrid.voxelsLeft > 0:
+			voxelsLeftLabel.text = "Voxels left: " + var2str(voxelsCreated) + "/" + var2str(outlineGrid.voxelCount)
+		else: 
+			voxelsLeftLabel.text = ""
+			
+		if voxelsCreated == outlineGrid.voxelCount && outlineGrid.voxelsLeft == 0 && outlineGrid.voxelCount != 0:
+			print ("done")
 			
 		remainingVoxelsLabel.text = "Remaining Metal: " + var2str(remainingVoxels)
 	
@@ -131,6 +146,12 @@ func _physics_process(delta):
 			if vox != null && vox.isTargeted:
 				targetVoxel = vox
 				break
+				
+	if forgeActive:
+		for vox in voxelList:
+			if vox != null && vox.global_transform.origin.distance_to(heatPoint.global_transform.origin) < 20:
+				vox.setHeat(10 * (20 - vox.global_transform.origin.distance_to(heatPoint.global_transform.origin) / 20), delta)
+				pass
 		
 func animStrike():
 	cameraShake.start(0.05 + 0.1 * (strikePower / 500), 50, 0.5 * ((strikePower) / 100), 0)
@@ -166,7 +187,7 @@ func Strike(target, power):
 		targetList.push_back(checkExistingVoxel(targetVoxel.translation + cameraBack + cameraRight, targetVoxel.global_transform.origin + cameraBack + cameraRight, 3))
 		targetList.push_back(checkExistingVoxel(targetVoxel.translation + cameraBack + cameraLeft, targetVoxel.global_transform.origin + cameraBack + cameraLeft, 3))
 		
-	if !removal:
+	if !removal && targetVoxel.heat >= targetVoxel.minForgeTemp:
 		for pos in targetList:
 			if pos != null && remainingVoxels > 0:
 				var vox = voxel.instance()
@@ -174,6 +195,7 @@ func Strike(target, power):
 				vox.translation = pos
 				vox.heat = targetVoxel.heat
 				remainingVoxels -= 1
+				voxelsCreated += 1
 		
 func checkExistingVoxel(targetPos, globalTargetPos, powerLevel):
 	var heatLoss = 0
@@ -186,6 +208,7 @@ func checkExistingVoxel(targetPos, globalTargetPos, powerLevel):
 		if vox.translation == targetPos:
 			if pritchelHole.has_point(Vector2(vox.global_transform.origin.x, vox.global_transform.origin.z)):
 				vox.queue_free()
+				voxelsCreated -= 1
 				# print("invalid position: " + var2str(vox.translation))
 				return null
 				
@@ -207,12 +230,14 @@ func addIngot(size):
 						var vox = voxel.instance()
 						voxelGrid.add_child(vox)
 						vox.translation = Vector3(x, 0, z)
+						voxelsCreated += 1
 			2: 
 				for x in range (-1, 3):
 					for z in range(-1, 2):
 						var vox = voxel.instance()
 						voxelGrid.add_child(vox)
 						vox.translation = Vector3(x, 0, z)
+						voxelsCreated += 1
 						
 		voxelGrid.translation = Vector3(0.5, 0.5, -0.5)
 		voxelGrid.rotation = Vector3(0, 0, 0)
@@ -265,7 +290,6 @@ func _on_StrikeCDTimer_timeout():
 
 func _on_PathTween_tween_completed(object, key):
 	forgeActive = !forgeActive
-	voxelGridCollider.disabled = !voxelGridCollider.disabled
 	
 	if !forgeActive:
 		voxelGrid.global_transform.origin = Vector3(0.5, 0.5, -0.5)
@@ -275,9 +299,4 @@ func _on_PathTween_tween_completed(object, key):
 		voxelGrid.global_transform.origin = Vector3(85, -8, 78)
 		voxelGrid.rotation = Vector3(0, PI / 2, 0)
 		print("moved to forge")
-	
 
-func _on_Area_input_event(camera, event, click_position, click_normal, shape_idx):
-	if forgeActive && event.type == InputEvent.MOUSE_BUTTON && event.pressed:
-		
-		pass

@@ -23,6 +23,9 @@ func _physics_process(delta):
 		outlineMesh.visible = true if isTargeted else false
 	
 	setHeat(heatLossRate, delta)
+	if heat >= heatTol - 1:
+		queue_free()
+		voxelHandler.voxelsCreated -= 1
 		
 	var mat = SpatialMaterial.new()
 	mat.albedo_color = getMaterialColor()
