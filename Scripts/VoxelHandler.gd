@@ -112,8 +112,10 @@ func _process(delta):
 				strikeTimer.start()
 			
 		if Input.is_action_pressed("shift"):
-			for vox in voxelList:
-				vox.setHeat(200, delta)
+			# for vox in voxelList:
+			# 	vox.setHeat(200, delta)
+			print(var2str(targetVoxel.translation))
+
 				
 			
 		# add ingot (debug)

@@ -1,0 +1,10 @@
+[gd_scene load_steps=2 format=2]
+
+[ext_resource path="res://Models/handle3.obj" type="ArrayMesh" id=1]
+
+[node name="Handle3" type="Spatial"]
+
+[node name="handle3" type="MeshInstance" parent="."]
+transform = Transform( 2.65432e-13, 1.62921e-06, 10, 10, -1.62921e-06, 0, 1.62921e-06, 10, -1.62921e-06, 0, 2, -0.5 )
+mesh = ExtResource( 1 )
+material/0 = null
