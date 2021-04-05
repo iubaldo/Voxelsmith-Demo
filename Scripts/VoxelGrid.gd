@@ -38,6 +38,4 @@ func _process(delta):
 		
 	if Input.is_action_just_pressed("debug_save"):
 		saveLoad.saveData("user://pattern.dat", outlineList)
-	if Input.is_action_just_pressed("debug_load"):
-		pass	
 	

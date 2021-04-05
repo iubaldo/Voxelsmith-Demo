@@ -7,7 +7,7 @@ const EASE = Tween.EASE_IN_OUT
 var amplitude = 0
 var priority = 0
 
-var origin = Vector3(0.058, 17.4, 3.3) # cam.global_transform.origin
+var origin = Vector3.ZERO
 
 func start(duration, frequency, amplitude, priority):
 	if priority >= self.priority:
