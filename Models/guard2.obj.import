@@ -1,0 +1,19 @@
+[remap]
+
+importer="wavefront_obj"
+type="Mesh"
+path="res://.import/guard2.obj-3edd2d3c4869e539e244a4adb6f2018d.mesh"
+
+[deps]
+
+files=[ "res://.import/guard2.obj-3edd2d3c4869e539e244a4adb6f2018d.mesh" ]
+
+source_file="res://Models/guard2.obj"
+dest_files=[ "res://.import/guard2.obj-3edd2d3c4869e539e244a4adb6f2018d.mesh", "res://.import/guard2.obj-3edd2d3c4869e539e244a4adb6f2018d.mesh" ]
+
+[params]
+
+generate_tangents=true
+scale_mesh=Vector3( 1, 1, 1 )
+offset_mesh=Vector3( 0, 0, 0 )
+optimize_mesh=true
