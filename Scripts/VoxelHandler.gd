@@ -1,8 +1,9 @@
 extends Spatial
 
 onready var voxel = preload("res://Scenes/Voxel.tscn")
-onready var voxelGrid = get_node("VoxelGrid")
-onready var voxelGridCollider = get_node("VoxelGrid/Area")
+onready var voxelGrid = get_node("VoxelGrid/Voxels")
+onready var outlineGrid = get_node("OutlineGrid")
+onready var voxelGridCollider = get_node("VoxelGrid/Area/CollisionShape")
 onready var powerLabel = get_node("SmithingUI/PowerLabel")
 onready var remainingVoxelsLabel = get_node("SmithingUI/RemainingVoxelsLabel")
 onready var heatLabel = get_node("SmithingUI/HeatLabel")
@@ -46,7 +47,10 @@ func _process(delta):
 		active = !active
 		
 	if forgeActive:
+		outlineGrid.visible = false
 		pass
+	else:
+		outlineGrid.visible = true
 	
 	
 	if active:
@@ -254,7 +258,17 @@ func _on_StrikeCDTimer_timeout():
 func _on_PathTween_tween_completed(object, key):
 	forgeActive = !forgeActive
 	voxelGridCollider.disabled = !voxelGridCollider.disabled
+	
+	if !forgeActive:
+		voxelGrid.global_transform.origin = Vector3(0.5, 0.5, -0.5)
+		voxelGrid.rotation = Vector3(0, 0, 0)
+		print("moved to anvil")
+	else:
+		voxelGrid.global_transform.origin = Vector3(90, -10, 78)
+		voxelGrid.rotation = Vector3(0, PI / 2, 0)
+		print("moved to forge")
+	
 
 func _on_Area_input_event(camera, event, click_position, click_normal, shape_idx):
-	if forgeActive:
+	if forgeActive && event.type == InputEvent.MOUSE_BUTTON && event.pressed:
 		pass

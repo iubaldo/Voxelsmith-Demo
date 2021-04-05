@@ -2,7 +2,7 @@ extends Spatial
 
 onready var saveLoad = preload("res://Scripts/SaveLoad.gd")
 onready var voxelOutline = preload("res://Scenes/VoxelOutline.tscn")
-onready var voxelGrid = get_parent().get_node("VoxelGrid")
+onready var voxelGrid = get_parent().get_node("VoxelGrid/Voxels")
 
 var outlineList = []
 var loadPath = "res://Patterns/pattern1.dat"

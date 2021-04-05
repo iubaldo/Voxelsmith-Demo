@@ -62,7 +62,7 @@ transform = Transform( 20, 0, 0, 0, 20, 0, 0, 0, 20, -12, -40.1, 0 )
 transform = Transform( -6.35391e-08, -0.39, 0, -6.35391e-08, 1.03518e-14, -1, 0.39, -6.35391e-08, -1.62921e-07, 0, 0, 0 )
 
 [node name="Forge" parent="Environment" instance=ExtResource( 11 )]
-transform = Transform( -6.51683e-06, 0, -40, 0, 40, 0, 40, 0, -6.51683e-06, 118.811, -40, 78.3325 )
+transform = Transform( -6.51683e-06, 0, -40, 0, 40, 0, 40, 0, -6.51683e-06, 120, -40, 78 )
 
 [node name="HeatPoint" type="Spatial" parent="Environment/Forge"]
 transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.668521, 0.360363 )
@@ -85,13 +85,16 @@ transform = Transform( 40, 0, 0, 0, 40, 0, 0, 0, 40, 240, -40, 190 )
 [node name="Floor" parent="Environment" instance=ExtResource( 12 )]
 transform = Transform( 200, 0, 0, 0, 50, 0, 0, 0, 200, 432.108, -45, 196.72 )
 
-[node name="VoxelGrid" parent="." instance=ExtResource( 1 )]
-transform = Transform( 1, 0, 0, 0, 1, 0, -8.88178e-16, 0, 1, 0.5, 0.499998, -0.5 )
+[node name="VoxelGrid" type="Spatial" parent="."]
+
+[node name="Voxels" parent="VoxelGrid" instance=ExtResource( 1 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0.5, 0.5, -0.5 )
 
 [node name="Area" type="Area" parent="VoxelGrid"]
+input_capture_on_drag = true
 
 [node name="CollisionShape" type="CollisionShape" parent="VoxelGrid/Area"]
-transform = Transform( 12, 0, 0, 0, 0.5, 0, 0, 0, 6, -0.5, 0, 0.5 )
+transform = Transform( 12, 0, 0, 0, 0.5, 0, 0, 0, 6, 0.5, 0.5, -0.5 )
 shape = SubResource( 2 )
 disabled = true
 
@@ -119,6 +122,5 @@ anims/HammerStrike = ExtResource( 8 )
 [connection signal="timeout" from="CameraPath/PathFollow/Camera/ScreenShake/ShakeFreq" to="CameraPath/PathFollow/Camera/ScreenShake" method="_on_ShakeFreq_timeout"]
 [connection signal="timeout" from="CameraPath/PathFollow/Camera/ScreenShake/ShakeDuration" to="CameraPath/PathFollow/Camera/ScreenShake" method="_on_ShakeDuration_timeout"]
 [connection signal="tween_completed" from="CameraPath/PathTween" to="." method="_on_PathTween_tween_completed"]
-[connection signal="input_event" from="VoxelGrid/Area" to="." method="_on_Area_input_event"]
 [connection signal="timeout" from="StrikeTimer" to="." method="_on_StrikeTimer_timeout"]
 [connection signal="timeout" from="StrikeCDTimer" to="." method="_on_StrikeCDTimer_timeout"]

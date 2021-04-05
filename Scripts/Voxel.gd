@@ -4,6 +4,7 @@ onready var mesh = get_node("MeshInstance")
 onready var defaultMat = mesh.get_surface_material(0)
 onready var outlineMesh = get_node("OutlineMesh")
 onready var heatGradient = preload("res://Shaders/Gradients/HeatGradient2.tres")
+onready var voxelHandler = get_tree().get_root().get_node("Smithing Scene")
 
 # metal attributes
 var voxelStrikePenalty = 0 # determines how much more power is needed to strike this voxel
@@ -18,7 +19,8 @@ var heatLossRate = -10 # determines rate of heat decrease
 var isTargeted = false
 
 func _physics_process(delta):
-	outlineMesh.visible = true if isTargeted else false
+	if !voxelHandler.forgeActive:
+		outlineMesh.visible = true if isTargeted else false
 	
 	setHeat(heatLossRate, delta)
 		
